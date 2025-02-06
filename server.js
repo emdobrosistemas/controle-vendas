@@ -33,7 +33,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Rota para a página principal - deve ser a última rota
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // Teste de conexão com o banco
