@@ -48,4 +48,10 @@ CREATE TABLE permissoes (
 
 -- Atualize o INSERT do usuário admin com um hash bcrypt válido para a senha '123456'
 INSERT INTO usuarios (nome, email, senha, tipo) 
-VALUES ('Administrador', 'admin@admin.com', '$2b$10$5YZVr5JVeWW/3HBGGf7G5.Og4TH8Xp.zX3RH3KhyxEKVHe/2XBAoO', 'admin');
+VALUES ('Administrador', 'admin@admin.com', '123456', 'admin');
+
+SHOW TABLES;
+DESCRIBE usuarios;
+DESCRIBE cidades;
+DESCRIBE lotes;
+DESCRIBE lancamentos;
