@@ -2,4 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Seus estilos customizados aqui */
+.accordion-content {
+    transition: max-height 0.3s ease-out;
+    overflow: hidden;
+}
+
+.accordion-btn svg {
+    transition: transform 0.3s ease;
+}
+
 /* Adicione estilos customizados aqui se necessário */ 

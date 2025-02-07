@@ -59,9 +59,7 @@ app.use((req, res, next) => {
 
 // Servir arquivos estáticos
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/js', express.static(path.join(__dirname, 'public/js')));
 app.use('/css', express.static(path.join(__dirname, 'public/css')));
-app.use('/images', express.static(path.join(__dirname, 'public/images')));
 
 // Adicione headers para CSS
 app.use((req, res, next) => {

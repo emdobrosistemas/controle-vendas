@@ -45,8 +45,8 @@ jobs:
 
     - name: Build CSS
       run: |
-        npm install -D tailwindcss@latest postcss@latest autoprefixer@latest
-        npx tailwindcss -i ./public/css/styles.css -o ./public/css/output.css --minify
+        npm run build:css
+        ls -la public/css/  # Debug: verificar se o arquivo foi gerado
 
     - name: Sync files
       uses: SamKirkland/FTP-Deploy-Action@4.3.3
@@ -61,7 +61,7 @@ jobs:
           **/node_modules/**
           .env
         include: |
-          public/js/api.js
           public/css/output.css
+          public/js/api.js
           public/images/**
           index.html
