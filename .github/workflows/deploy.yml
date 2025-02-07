@@ -55,3 +55,6 @@ jobs:
           **/.git*/**
           **/node_modules/**
           .env
+        include: |
+          public/js/api.js
+          public/images/logo-branca.png
