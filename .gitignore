@@ -1,26 +1,5 @@
-# Dependencies
 node_modules/
-
-# Environment variables
+vendor/
 .env
-
-# Logs
-logs
-*.log
-npm-debug.log*
-
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
-
-# IDE files
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS files
-.DS_Store
-Thumbs.db 
+package-lock.json
+public/css/output.css
