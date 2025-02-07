@@ -44,16 +44,48 @@ function converterParaNumero(valor) {
     return parseFloat(valor.replace(/[R$\s.]/g, '').replace(',', '.'));
 }
 
+// Função genérica para tratar erros da API
+async function handleApiResponse(response) {
+    if (!response.ok) {
+        const error = await response.json().catch(() => ({ message: 'Erro na requisição' }));
+        throw new Error(error.message || `Erro ${response.status}`);
+    }
+    return response.json();
+}
+
+// Função de login atualizada
+async function login(email, senha) {
+    try {
+        const response = await fetch(`${API_URL}/usuarios/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, senha })
+        });
+        
+        const data = await handleApiResponse(response);
+        localStorage.setItem('usuario', JSON.stringify(data));
+        document.getElementById('telaLogin').classList.add('hidden');
+        document.getElementById('sistema').classList.remove('hidden');
+        return data;
+    } catch (error) {
+        alert(error.message || 'Erro ao fazer login');
+        throw error;
+    }
+}
+
 // Carregar cidades e lotes nos selects
 async function carregarDados() {
     try {
         const [cidades, lotes] = await Promise.all([
-            fetch(`${API_URL}/cidades`).then(res => res.json()),
-            fetch(`${API_URL}/lotes`).then(res => res.json())
+            fetch(`${API_URL}/cidades`).then(handleApiResponse),
+            fetch(`${API_URL}/lotes`).then(handleApiResponse)
         ]);
 
         const cidadeSelect = document.querySelector('select[name="cidade"]');
         const loteSelect = document.querySelector('select[name="lote"]');
+
+        cidadeSelect.innerHTML = '<option value="">Selecione uma cidade</option>';
+        loteSelect.innerHTML = '<option value="">Selecione um lote</option>';
 
         cidades.forEach(cidade => {
             cidadeSelect.innerHTML += `<option value="${cidade.id}">${cidade.nome}</option>`;
@@ -63,7 +95,7 @@ async function carregarDados() {
             loteSelect.innerHTML += `<option value="${lote.id}">${lote.numero}</option>`;
         });
     } catch (error) {
-        console.error('Erro ao carregar dados:', error);
+        alert('Erro ao carregar dados: ' + error.message);
     }
 }
 
@@ -77,7 +109,7 @@ function formatarData(dataString) {
 async function carregarTabelas() {
     try {
         // Carregar cidades
-        const cidades = await fetch(`${API_URL}/cidades`).then(res => res.json());
+        const cidades = await fetch(`${API_URL}/cidades`).then(handleApiResponse);
         const tabelaCidades = document.getElementById('tabelaCidades');
         tabelaCidades.innerHTML = cidades.map(cidade => `
             <tr class="hover:bg-gray-50">
@@ -88,7 +120,7 @@ async function carregarTabelas() {
         `).join('');
 
         // Carregar lotes
-        const lotes = await fetch(`${API_URL}/lotes`).then(res => res.json());
+        const lotes = await fetch(`${API_URL}/lotes`).then(handleApiResponse);
         const tabelaLotes = document.getElementById('tabelaLotes');
         tabelaLotes.innerHTML = lotes.map(lote => `
             <tr class="hover:bg-gray-50">
@@ -838,70 +870,20 @@ document.querySelector('#formCidade').addEventListener('submit', cadastrarCidade
 document.querySelector('#formLote').addEventListener('submit', cadastrarLote);
 document.querySelector('#formLancamento').addEventListener('submit', cadastrarLancamento);
 
-// Funções de autenticação
-async function login(email, senha) {
+// Event Listeners
+document.getElementById('formLogin').addEventListener('submit', async function(event) {
+    event.preventDefault();
     try {
-        const response = await fetch(`${API_URL}/usuarios/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ email, senha })
-        });
-
-        if (!response.ok) {
-            throw new Error('Credenciais inválidas');
-        }
-
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Erro no login:', error);
-        throw error;
-    }
-}
-
-function fazerLogout() {
-    // Limpar dados do usuário
-    localStorage.removeItem('usuario');
-    
-    // Mostrar tela de login e esconder sistema
-    document.getElementById('telaLogin').classList.remove('hidden');
-    document.getElementById('sistema').classList.add('hidden');
-    
-    // Limpar formulários
-    document.getElementById('formLogin').reset();
-}
-
-// Verificar se usuário está logado ao carregar a página
-document.addEventListener('DOMContentLoaded', () => {
-    const usuario = localStorage.getItem('usuario');
-    
-    if (usuario) {
-        document.getElementById('telaLogin').classList.add('hidden');
-        document.getElementById('sistema').classList.remove('hidden');
-        Promise.all([
+        const email = document.querySelector('input[name="email"]').value;
+        const senha = document.querySelector('input[name="senha"]').value;
+        await login(email, senha);
+        await Promise.all([
             carregarDados(),
             carregarTabelas(),
             carregarRelatorio(),
             carregarResultados(),
             carregarConsolidado()
         ]);
-    }
-});
-
-// Event Listeners
-document.getElementById('formLogin').addEventListener('submit', async function(event) {
-    event.preventDefault();
-    const email = document.querySelector('input[name="email"]').value;
-    const senha = document.querySelector('input[name="senha"]').value;
-    
-    try {
-        const result = await login(email, senha);
-        if (result.token) {
-            localStorage.setItem('token', result.token);
-            window.location.href = '/dashboard';
-        }
     } catch (error) {
         console.error('Erro no login:', error);
     }
