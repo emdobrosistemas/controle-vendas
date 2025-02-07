@@ -11,6 +11,22 @@ jobs:
     steps:
     - name: Get latest code
       uses: actions/checkout@v2
+
+    - name: Install Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16'
+
+    - name: Install Dependencies
+      run: npm install
+
+    - name: Create .env file
+      run: |
+        echo "DB_HOST=${{ secrets.DB_HOST }}" > .env
+        echo "DB_USER=${{ secrets.DB_USER }}" >> .env
+        echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+        echo "DB_DATABASE=${{ secrets.DB_DATABASE }}" >> .env
+        echo "PORT=${{ secrets.PORT }}" >> .env
     
     - name: Sync files
       uses: SamKirkland/FTP-Deploy-Action@4.3.3
@@ -19,13 +35,7 @@ jobs:
         username: ${{ secrets.HOSTINGER_USERNAME }}
         password: ${{ secrets.HOSTINGER_PASSWORD }}
         server-dir: /home/u727308653/domains/brasilemdobro.com.br/public_html/gestao/
-    
-    - name: Execute post-deploy script
-      uses: fifsky/ssh-action@master
-      with:
-        command: |
-          cd /home/u727308653/domains/brasilemdobro.com.br/public_html/gestao
-          node post-deploy.js
-        host: ${{ secrets.HOSTINGER_HOST }}
-        user: ${{ secrets.HOSTINGER_USERNAME }}
-        pass: ${{ secrets.HOSTINGER_PASSWORD }}
+        exclude: |
+          **/.git*
+          **/.git*/**
+          **/node_modules/**
