@@ -47,6 +47,7 @@ jobs:
       run: |
         npm run build:css
         ls -la public/css/  # Debug: verificar se o arquivo foi gerado
+        cat public/css/output.css  # Debug: verificar conteúdo do arquivo
 
     - name: Sync files
       uses: SamKirkland/FTP-Deploy-Action@4.3.3
@@ -65,3 +66,4 @@ jobs:
           public/js/api.js
           public/images/**
           index.html
+          .htaccess

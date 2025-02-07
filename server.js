@@ -57,7 +57,7 @@ app.use((req, res, next) => {
     next();
 });
 
-// Servir arquivos estáticos
+// Servir arquivos estáticos - coloque antes de todas as outras rotas
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/css', express.static(path.join(__dirname, 'public/css')));
 
@@ -75,7 +75,7 @@ app.use((req, res, next) => {
     next();
 });
 
-// Rota para a página principal
+// Rota para a página principal deve ser a última
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
