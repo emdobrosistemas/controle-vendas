@@ -53,6 +53,23 @@ async function handleApiResponse(response) {
     return response.json();
 }
 
+// Função genérica para chamadas à API
+async function fetchApi(endpoint, options = {}) {
+    const defaultOptions = {
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    };
+
+    const response = await fetch(`${API_URL}${endpoint}`, {
+        ...defaultOptions,
+        ...options
+    });
+
+    return handleApiResponse(response);
+}
+
 // Função de login atualizada
 async function login(email, senha) {
     try {
@@ -77,8 +94,8 @@ async function login(email, senha) {
 async function carregarDados() {
     try {
         const [cidades, lotes] = await Promise.all([
-            fetch(`${API_URL}/cidades`).then(handleApiResponse),
-            fetch(`${API_URL}/lotes`).then(handleApiResponse)
+            fetchApi('/cidades'),
+            fetchApi('/lotes')
         ]);
 
         const cidadeSelect = document.querySelector('select[name="cidade"]');
@@ -109,7 +126,7 @@ function formatarData(dataString) {
 async function carregarTabelas() {
     try {
         // Carregar cidades
-        const cidades = await fetch(`${API_URL}/cidades`).then(handleApiResponse);
+        const cidades = await fetchApi('/cidades');
         const tabelaCidades = document.getElementById('tabelaCidades');
         tabelaCidades.innerHTML = cidades.map(cidade => `
             <tr class="hover:bg-gray-50">
@@ -120,7 +137,7 @@ async function carregarTabelas() {
         `).join('');
 
         // Carregar lotes
-        const lotes = await fetch(`${API_URL}/lotes`).then(handleApiResponse);
+        const lotes = await fetchApi('/lotes');
         const tabelaLotes = document.getElementById('tabelaLotes');
         tabelaLotes.innerHTML = lotes.map(lote => `
             <tr class="hover:bg-gray-50">
@@ -140,11 +157,8 @@ async function cadastrarCidade(event) {
     const nome = document.querySelector('input[name="nome_cidade"]').value;
     
     try {
-        const response = await fetch(`${API_URL}/cidades`, {
+        const response = await fetchApi('/cidades', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
             body: JSON.stringify({ nome })
         });
         
@@ -163,11 +177,8 @@ async function cadastrarLote(event) {
     const numero = document.querySelector('input[name="numero_lote"]').value;
     
     try {
-        const response = await fetch(`${API_URL}/lotes`, {
+        const response = await fetchApi('/lotes', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
             body: JSON.stringify({ numero })
         });
         
@@ -192,11 +203,8 @@ async function cadastrarLancamento(event) {
     };
     
     try {
-        const response = await fetch(`${API_URL}/lancamentos`, {
+        const response = await fetchApi('/lancamentos', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
             body: JSON.stringify(formData)
         });
         
@@ -213,8 +221,8 @@ async function cadastrarLancamento(event) {
 // Função para carregar e exibir o relatório
 async function carregarRelatorio() {
     try {
-        const response = await fetch(`${API_URL}/lancamentos`);
-        const lancamentos = await response.json();
+        const response = await fetchApi('/lancamentos');
+        const lancamentos = await response;
 
         // Agrupa lançamentos por cidade
         const lancamentosPorCidade = lancamentos.reduce((acc, lancamento) => {
@@ -397,12 +405,8 @@ async function salvarEdicao(id) {
     });
     
     try {
-        const response = await fetch(`${API_URL}/lancamentos/${id}`, {
+        const response = await fetchApi(`/lancamentos/${id}`, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
             body: JSON.stringify({ 
                 valor_faturado: novoValor 
             })
@@ -424,7 +428,7 @@ async function salvarEdicao(id) {
             // Esconde os botões de edição
             cancelarEdicao(id);
         } else {
-            const errorData = await response.json();
+            const errorData = await response;
             console.error('Erro do servidor:', errorData);
             alert('Erro ao salvar: ' + (errorData.error || 'Erro desconhecido'));
         }
@@ -437,8 +441,8 @@ async function salvarEdicao(id) {
 // Função para calcular o relatório de resultados
 async function carregarResultados() {
     try {
-        const response = await fetch(`${API_URL}/lancamentos`);
-        const lancamentos = await response.json();
+        const response = await fetchApi('/lancamentos');
+        const lancamentos = await response;
 
         // Primeiro, agrupa por cidade
         const resultadosPorCidade = {};
@@ -528,12 +532,12 @@ async function carregarResultados() {
 async function carregarConsolidado() {
     try {
         const [lancamentosResponse, lotesResponse] = await Promise.all([
-            fetch(`${API_URL}/lancamentos`),
-            fetch(`${API_URL}/lotes`)
+            fetchApi('/lancamentos'),
+            fetchApi('/lotes')
         ]);
         
-        const lancamentos = await lancamentosResponse.json();
-        const lotes = await lotesResponse.json();
+        const lancamentos = await lancamentosResponse;
+        const lotes = await lotesResponse;
 
         // Define a ordem específica dos lotes
         const ordemLotes = ['Pré-venda', 'Primeiro Lote', 'Segundo Lote', 'Terceiro Lote'];
