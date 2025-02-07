@@ -18,13 +18,13 @@ jobs:
         server: ${{ secrets.HOSTINGER_HOST }}
         username: ${{ secrets.HOSTINGER_USERNAME }}
         password: ${{ secrets.HOSTINGER_PASSWORD }}
-        server-dir: /public_html/gestao/
+        server-dir: /home/u727308653/domains/brasilemdobro.com.br/public_html/gestao/
     
     - name: Execute post-deploy script
       uses: fifsky/ssh-action@master
       with:
         command: |
-          cd /public_html/gestao
+          cd /home/u727308653/domains/brasilemdobro.com.br/public_html/gestao
           node post-deploy.js
         host: ${{ secrets.HOSTINGER_HOST }}
         user: ${{ secrets.HOSTINGER_USERNAME }}
