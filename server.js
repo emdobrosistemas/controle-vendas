@@ -63,6 +63,14 @@ app.use('/js', express.static(path.join(__dirname, 'public/js')));
 app.use('/css', express.static(path.join(__dirname, 'public/css')));
 app.use('/images', express.static(path.join(__dirname, 'public/images')));
 
+// Adicione headers para CSS
+app.use((req, res, next) => {
+    if (req.url.endsWith('.css')) {
+        res.setHeader('Content-Type', 'text/css');
+    }
+    next();
+});
+
 // Adicione logs para debug
 app.use((req, res, next) => {
     console.log(`${req.method} ${req.url}`);
@@ -94,7 +102,8 @@ console.log('Database config:', {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+
+const server = app.listen(PORT, () => {
     console.log(`Servidor rodando na porta ${PORT}`);
     console.log('Variáveis de ambiente carregadas:', {
         DB_HOST: process.env.DB_HOST,
@@ -102,4 +111,12 @@ app.listen(PORT, () => {
         DB_DATABASE: process.env.DB_DATABASE,
         PORT: process.env.PORT
     });
+}).on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+        console.log(`Porta ${PORT} em uso, tentando porta ${PORT + 1}`);
+        server.close();
+        app.listen(PORT + 1);
+    } else {
+        console.error('Erro ao iniciar servidor:', err);
+    }
 });
