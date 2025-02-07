@@ -43,6 +43,9 @@ jobs:
         echo "AddType application/javascript .js" >> .htaccess
         echo "AddType text/css .css" >> .htaccess
 
+    - name: Build CSS
+      run: npm run build:css
+
     - name: Sync files
       uses: SamKirkland/FTP-Deploy-Action@4.3.3
       with:
@@ -58,3 +61,4 @@ jobs:
         include: |
           public/js/api.js
           public/images/logo-branca.png
+          public/css/output.css

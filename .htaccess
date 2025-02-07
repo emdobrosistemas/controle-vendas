@@ -1,0 +1,12 @@
+RewriteEngine On
+
+# Permitir acesso direto a arquivos existentes
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Redirecionar todas as outras requisições para o Node.js
+RewriteRule ^(.*)$ http://127.0.0.1:3000/$1 [P,L]
+
+# Adicione tipos MIME corretos
+AddType application/javascript .js
+AddType text/css .css 

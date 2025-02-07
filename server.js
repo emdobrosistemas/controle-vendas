@@ -57,13 +57,12 @@ app.use((req, res, next) => {
     next();
 });
 
-// Adicione verificação de existência de arquivos
-app.use(express.static(path.join(__dirname, 'public'), {
-    fallthrough: true,
-    redirect: false
-}));
+// Servir arquivos estáticos
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/js', express.static(path.join(__dirname, 'public/js')));
+app.use('/images', express.static(path.join(__dirname, 'public/images')));
 
-// Rota para a página principal - deve ser a última rota
+// Rota para a página principal
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });

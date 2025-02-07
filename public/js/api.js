@@ -837,45 +837,19 @@ document.querySelector('#formLote').addEventListener('submit', cadastrarLote);
 document.querySelector('#formLancamento').addEventListener('submit', cadastrarLancamento);
 
 // Funções de autenticação
-async function fazerLogin(event) {
-    event.preventDefault();
-    const email = document.querySelector('input[name="email"]').value;
-    const senha = document.querySelector('input[name="senha"]').value;
-
+async function login(email, senha) {
     try {
-        const response = await fetch(`${API_URL}/usuarios/login`, {
+        const response = await fetch('/api/usuarios/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ email, senha })
         });
-
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error || 'Erro ao fazer login');
-        }
-
-        const userData = await response.json();
-        
-        // Salvar dados do usuário
-        localStorage.setItem('usuario', JSON.stringify(userData));
-        
-        // Esconder tela de login e mostrar sistema
-        document.getElementById('telaLogin').classList.add('hidden');
-        document.getElementById('sistema').classList.remove('hidden');
-        
-        // Carregar dados iniciais
-        await Promise.all([
-            carregarDados(),
-            carregarTabelas(),
-            carregarRelatorio(),
-            carregarResultados(),
-            carregarConsolidado()
-        ]);
-
+        return await response.json();
     } catch (error) {
-        alert(error.message);
+        console.error('Erro no login:', error);
+        throw error;
     }
 }
 
@@ -909,5 +883,5 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Event Listeners
-document.getElementById('formLogin').addEventListener('submit', fazerLogin);
+document.getElementById('formLogin').addEventListener('submit', login);
 document.getElementById('logoutBtn').addEventListener('click', fazerLogout); 
