@@ -1,5 +1,7 @@
 // Funções para interagir com a API
-const API_URL = 'http://localhost:3000/api';
+const API_URL = window.location.hostname === 'localhost' 
+    ? 'http://localhost:3000/api'
+    : '/gestao/api';
 
 // Função para permitir apenas números e vírgula
 function apenasNumeros(event) {
@@ -839,14 +841,20 @@ document.querySelector('#formLancamento').addEventListener('submit', cadastrarLa
 // Funções de autenticação
 async function login(email, senha) {
     try {
-        const response = await fetch('/api/usuarios/login', {
+        const response = await fetch(`${API_URL}/usuarios/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ email, senha })
         });
-        return await response.json();
+
+        if (!response.ok) {
+            throw new Error('Credenciais inválidas');
+        }
+
+        const data = await response.json();
+        return data;
     } catch (error) {
         console.error('Erro no login:', error);
         throw error;
