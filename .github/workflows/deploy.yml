@@ -51,18 +51,12 @@ jobs:
     - name: Sync files
       uses: SamKirkland/FTP-Deploy-Action@4.3.3
       with:
-        server: ${{ secrets.HOSTINGER_HOST }}
-        username: ${{ secrets.HOSTINGER_USERNAME }}
-        password: ${{ secrets.HOSTINGER_PASSWORD }}
+        server: ${{ secrets.DB_HOST }}
+        username: ${{ secrets.DB_USER }}
+        password: ${{ secrets.DB_PASSWORD }}
         server-dir: /home/u727308653/domains/brasilemdobro.com.br/public_html/gestao/
         exclude: |
           **/.git*
           **/.git*/**
           **/node_modules/**
           .env
-        include: |
-          public/css/output.css
-          public/js/api.js
-          public/images/**
-          index.html
-          .htaccess
