@@ -28,6 +28,21 @@ jobs:
         echo "DB_DATABASE=${{ secrets.DB_DATABASE }}" >> .env
         echo "PORT=${{ secrets.PORT }}" >> .env
     
+    - name: Create .htaccess file
+      run: |
+        echo "RewriteEngine On" > .htaccess
+        echo "" >> .htaccess
+        echo "# Permitir acesso direto a arquivos existentes" >> .htaccess
+        echo "RewriteCond %{REQUEST_FILENAME} !-f" >> .htaccess
+        echo "RewriteCond %{REQUEST_FILENAME} !-d" >> .htaccess
+        echo "" >> .htaccess
+        echo "# Redirecionar todas as outras requisições para o Node.js" >> .htaccess
+        echo "RewriteRule ^(.*)$ http://127.0.0.1:3000/\$1 [P,L]" >> .htaccess
+        echo "" >> .htaccess
+        echo "# Adicione tipos MIME corretos" >> .htaccess
+        echo "AddType application/javascript .js" >> .htaccess
+        echo "AddType text/css .css" >> .htaccess
+
     - name: Sync files
       uses: SamKirkland/FTP-Deploy-Action@4.3.3
       with:
