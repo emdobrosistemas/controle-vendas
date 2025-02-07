@@ -28,4 +28,4 @@ jobs:
           node post-deploy.js
         host: ${{ secrets.HOSTINGER_HOST }}
         user: ${{ secrets.HOSTINGER_USERNAME }}
-        pass: ${{ secrets.HOSTINGER_PASSWORD }} 
+        pass: ${{ secrets.HOSTINGER_PASSWORD }}
