@@ -60,7 +60,14 @@ app.use((req, res, next) => {
 // Servir arquivos estáticos
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/js', express.static(path.join(__dirname, 'public/js')));
+app.use('/css', express.static(path.join(__dirname, 'public/css')));
 app.use('/images', express.static(path.join(__dirname, 'public/images')));
+
+// Adicione logs para debug
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.url}`);
+    next();
+});
 
 // Rota para a página principal
 app.get('*', (req, res) => {

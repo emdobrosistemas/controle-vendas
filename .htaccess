@@ -7,6 +7,11 @@ RewriteCond %{REQUEST_FILENAME} !-d
 # Redirecionar todas as outras requisições para o Node.js
 RewriteRule ^(.*)$ http://127.0.0.1:3000/$1 [P,L]
 
-# Adicione tipos MIME corretos
+# Tipos MIME
 AddType application/javascript .js
-AddType text/css .css 
+AddType text/css .css
+
+# Headers de cache para arquivos estáticos
+<FilesMatch "\.(js|css|jpg|jpeg|png|gif)$">
+    Header set Cache-Control "max-age=31536000, public"
+</FilesMatch> 

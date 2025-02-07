@@ -60,5 +60,5 @@ jobs:
           .env
         include: |
           public/js/api.js
-          public/images/logo-branca.png
           public/css/output.css
+          public/images/**

@@ -883,5 +883,20 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Event Listeners
-document.getElementById('formLogin').addEventListener('submit', login);
+document.getElementById('formLogin').addEventListener('submit', async function(event) {
+    event.preventDefault();
+    const email = document.querySelector('input[name="email"]').value;
+    const senha = document.querySelector('input[name="senha"]').value;
+    
+    try {
+        const result = await login(email, senha);
+        if (result.token) {
+            localStorage.setItem('token', result.token);
+            window.location.href = '/dashboard';
+        }
+    } catch (error) {
+        console.error('Erro no login:', error);
+    }
+});
+
 document.getElementById('logoutBtn').addEventListener('click', fazerLogout); 
