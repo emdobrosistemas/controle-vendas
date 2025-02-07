@@ -46,7 +46,10 @@ jobs:
         echo "AddType text/css .css" >> .htaccess
 
     - name: Build CSS
-      run: npm run build:css
+      run: |
+        npm install
+        npm run build:css
+        ls -la public/css/
 
     - name: Sync files
       uses: SamKirkland/FTP-Deploy-Action@4.3.3
@@ -60,3 +63,4 @@ jobs:
           **/.git*/**
           **/node_modules/**
           .env
+          package-lock.json
