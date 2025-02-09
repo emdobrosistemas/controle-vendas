@@ -71,6 +71,18 @@ app.use((req, res, next) => {
     next();
 });
 
+// Middleware para debug de rotas
+app.use((req, res, next) => {
+    console.log('Request:', {
+        method: req.method,
+        url: req.url,
+        path: req.path,
+        originalUrl: req.originalUrl,
+        baseUrl: req.baseUrl
+    });
+    next();
+});
+
 // Rotas da API
 app.use(`${API_PREFIX}/cidades`, require('./routes/cidadeRoutes'));
 app.use(`${API_PREFIX}/lotes`, require('./routes/loteRoutes'));

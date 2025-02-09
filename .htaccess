@@ -5,28 +5,26 @@ RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
 
-# Redirecionar todas as requisições da API para o Node.js
+# Redirecionar requisições da API para o Node.js
 RewriteCond %{REQUEST_URI} ^/gestao/api/
 RewriteRule ^gestao/api/(.*)$ http://127.0.0.1:3000/gestao/api/$1 [P,L]
 
-# Para todas as outras requisições não-API, servir o index.html
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
+# Para todas as outras requisições, servir o index.html
 RewriteRule ^ /gestao/index.html [L]
 
 # Tipos MIME
 AddType application/javascript .js
 AddType text/css .css
 
-# Headers de cache para arquivos estáticos
-<FilesMatch "\.(js|css|jpg|jpeg|png|gif)$">
-    Header set Cache-Control "max-age=31536000, public"
-</FilesMatch>
-
 # Headers de segurança e CORS
 Header set Access-Control-Allow-Origin "*"
 Header set Access-Control-Allow-Methods "GET,PUT,POST,DELETE,OPTIONS"
 Header set Access-Control-Allow-Headers "Content-Type, Authorization"
+
+# Cache para arquivos estáticos
+<FilesMatch "\.(js|css|jpg|jpeg|png|gif)$">
+    Header set Cache-Control "max-age=31536000, public"
+</FilesMatch>
 
 # Força HTTPS
 RewriteCond %{HTTPS} off

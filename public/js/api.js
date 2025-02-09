@@ -897,4 +897,15 @@ document.getElementById('formLogin').addEventListener('submit', async function(e
     }
 });
 
-document.getElementById('logoutBtn').addEventListener('click', fazerLogout); 
+document.getElementById('logoutBtn').addEventListener('click', fazerLogout);
+
+// Função de logout
+async function fazerLogout() {
+    try {
+        localStorage.removeItem('usuario');
+        document.getElementById('sistema').classList.add('hidden');
+        document.getElementById('telaLogin').classList.remove('hidden');
+    } catch (error) {
+        console.error('Erro ao fazer logout:', error);
+    }
+} 
