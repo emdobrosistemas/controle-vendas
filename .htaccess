@@ -2,7 +2,6 @@ RewriteEngine On
 
 # Habilitar o proxy
 Options +FollowSymLinks
-RewriteEngine On
 ProxyRequests Off
 ProxyPreserveHost On
 
@@ -20,7 +19,7 @@ Header set Access-Control-Allow-Origin "*"
 Header set Access-Control-Allow-Methods "GET,POST,PUT,DELETE,OPTIONS"
 Header set Access-Control-Allow-Headers "Content-Type, Authorization"
 
-# Para todas as outras requisições não-API, servir o index.html
+# Para todas as outras requisições, servir o index.html
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^ /gestao/index.html [L]

@@ -26,7 +26,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-// Cadastrar nova cidade
+// POST /cidades
 router.post('/', async (req, res) => {
     try {
         const { nome } = req.body;
