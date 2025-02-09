@@ -1,25 +1,33 @@
 RewriteEngine On
 
+# Habilitar o proxy
+Options +FollowSymLinks
+RewriteEngine On
+ProxyRequests Off
+ProxyPreserveHost On
+
 # Permitir acesso direto a arquivos estáticos
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
 
-# Redirecionar requisições da API para o Node.js
+# Redirecionar API para Node.js
 RewriteCond %{REQUEST_URI} ^/gestao/api/
-RewriteRule ^gestao/api/(.*)$ http://127.0.0.1:3000/gestao/api/$1 [P,L]
+RewriteRule ^gestao/api/(.*) http://localhost:3000/gestao/api/$1 [P,L]
 
-# Para todas as outras requisições, servir o index.html
+# Headers de segurança e CORS
+Header set Access-Control-Allow-Origin "*"
+Header set Access-Control-Allow-Methods "GET,POST,PUT,DELETE,OPTIONS"
+Header set Access-Control-Allow-Headers "Content-Type, Authorization"
+
+# Para todas as outras requisições não-API, servir o index.html
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^ /gestao/index.html [L]
 
 # Tipos MIME
 AddType application/javascript .js
 AddType text/css .css
-
-# Headers de segurança e CORS
-Header set Access-Control-Allow-Origin "*"
-Header set Access-Control-Allow-Methods "GET,PUT,POST,DELETE,OPTIONS"
-Header set Access-Control-Allow-Headers "Content-Type, Authorization"
 
 # Cache para arquivos estáticos
 <FilesMatch "\.(js|css|jpg|jpeg|png|gif)$">

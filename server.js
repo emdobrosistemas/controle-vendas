@@ -83,6 +83,27 @@ app.use((req, res, next) => {
     next();
 });
 
+// Middleware para debug
+app.use((req, res, next) => {
+    console.log('API Request:', {
+        method: req.method,
+        url: req.url,
+        path: req.path,
+        originalUrl: req.originalUrl
+    });
+    next();
+});
+
+// Middleware para CORS
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// Middleware para JSON
+app.use(express.json());
+
 // Rotas da API
 app.use(`${API_PREFIX}/cidades`, require('./routes/cidadeRoutes'));
 app.use(`${API_PREFIX}/lotes`, require('./routes/loteRoutes'));
@@ -104,12 +125,11 @@ app.use((req, res, next) => {
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/css', express.static(path.join(__dirname, 'public/css')));
 
-// Middleware para tratar erros 404 da API
+// Middleware para erros da API
 app.use(`${API_PREFIX}/*`, (req, res) => {
-    console.log('API 404:', req.originalUrl);
-    res.status(404).json({ 
-        error: 'Rota não encontrada',
-        path: req.originalUrl 
+    res.status(404).json({
+        error: 'API endpoint não encontrado',
+        path: req.originalUrl
     });
 });
 
