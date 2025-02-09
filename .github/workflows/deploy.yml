@@ -1,26 +1,21 @@
-name: 🚀 Deploy website on push
+name: Deploy to Hostinger
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
   web-deploy:
-    name: 🎉 Deploy
+    name: Deploy
     runs-on: ubuntu-latest
-    environment: production
-
     steps:
-    - name: 🚚 Get latest code
-      uses: actions/checkout@v3
-
-    - name: 📂 SFTP Deploy
-      uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+    - uses: actions/checkout@v2
+    
+    - name: FTP Deploy
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
       with:
-        username: ${{ secrets.HOSTINGER_USERNAME }}
-        server: ${{ secrets.HOSTINGER_HOST }}
-        port: 22
-        local_path: './*'
-        remote_path: '/home/u727308653/domains/brasilemdobro.com.br/public_html/gestao/api'
+        server: ftp.brasilemdobro.com.br
+        username: u727308653.controledevendas
         password: ${{ secrets.HOSTINGER_PASSWORD }}
+        server-dir: /home/u727308653/domains/brasilemdobro.com.br/public_html/gestao/
+        protocol: ftp
