@@ -12,7 +12,7 @@ const API_PREFIX = '/gestao/api';
 // Middlewares
 app.use(cors({
     origin: process.env.NODE_ENV === 'production' 
-        ? ['https://yourdomain.com', 'https://api.yourdomain.com'] // Replace with your actual domains
+        ? ['https://gestao.brasilemdobro.com.br', 'https://api.brasilemdobro.com.br'] // Domínios corretos
         : 'http://localhost:3000',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
@@ -84,25 +84,32 @@ app.use(`${API_PREFIX}/usuarios`, require('./routes/usuarioRoutes'));
 
 // Tratamento de erros para rotas da API
 app.use(API_PREFIX, (err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({ error: 'Erro interno do servidor' });
+    console.error('API Error:', {
+        error: err,
+        stack: err.stack,
+        path: req.path,
+        method: req.method
+    });
+    
+    res.status(err.status || 500).json({ 
+        error: 'Erro na requisição',
+        message: process.env.NODE_ENV === 'development' ? err.message : 'Erro interno do servidor',
+        path: req.path
+    });
 });
 
-// Adicione um middleware de erro mais detalhado
-app.use((err, req, res, next) => {
-    console.error('=== Error Details ===');
-    console.error('Error:', err);
-    console.error('Stack:', err.stack);
-    console.error('URL:', req.originalUrl);
-    console.error('Method:', req.method);
-    console.error('Body:', req.body);
-    console.error('=== End Error Details ===');
+// Adicione um middleware para tratar erros 404 específicos da API
+app.use(`${API_PREFIX}/*`, (req, res) => {
+    console.log('API 404:', {
+        path: req.path,
+        method: req.method,
+        originalUrl: req.originalUrl
+    });
     
-    res.status(500).json({
-        error: 'Erro interno do servidor',
-        message: process.env.NODE_ENV === 'development' ? err.message : undefined,
-        path: req.originalUrl,
-        method: req.method
+    res.status(404).json({ 
+        error: 'Rota não encontrada',
+        message: 'O endpoint solicitado não existe',
+        path: req.originalUrl
     });
 });
 
