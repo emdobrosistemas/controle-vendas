@@ -8,11 +8,28 @@ const app = express();
 
 // Middlewares
 app.use(cors({
-    origin: '*', // Em produção, especifique os domínios permitidos
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    origin: process.env.NODE_ENV === 'production' 
+        ? ['https://yourdomain.com', 'https://api.yourdomain.com'] // Replace with your actual domains
+        : 'http://localhost:3000',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+    optionsSuccessStatus: 204
 }));
 app.use(express.json());
+
+// Add security headers middleware
+app.use((req, res, next) => {
+    // Prevent clickjacking
+    res.header('X-Frame-Options', 'DENY');
+    // Enable XSS filter
+    res.header('X-XSS-Protection', '1; mode=block');
+    // Prevent MIME type sniffing
+    res.header('X-Content-Type-Options', 'nosniff');
+    // Strict transport security (uncomment in production)
+    // res.header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    next();
+});
 
 // Prefixo /api para todas as rotas da API
 app.use('/api', (req, res, next) => {
