@@ -1,7 +1,7 @@
 // Funções para interagir com a API
 const API_BASE_URL = window.location.hostname === 'localhost' 
-    ? 'http://localhost:3000/gestao/api'
-    : '/gestao/api';  // Caminho correto para produção
+    ? 'http://localhost:3000/gestao/public/js/api'
+    : '/gestao/public/js/api';  // Caminho correto para produção
 
 // Função para permitir apenas números e vírgula
 function apenasNumeros(event) {
