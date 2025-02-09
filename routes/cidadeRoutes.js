@@ -4,7 +4,12 @@ const db = require('../db/connection');
 
 // Log para debug
 router.use((req, res, next) => {
-    console.log('Cidade Route accessed:', req.method, req.url);
+    console.log('=== Cidade Route Debug ===');
+    console.log('Method:', req.method);
+    console.log('URL:', req.url);
+    console.log('Body:', req.body);
+    console.log('Query:', req.query);
+    console.log('========================');
     next();
 });
 
@@ -12,10 +17,18 @@ router.use((req, res, next) => {
 router.get('/', async (req, res) => {
     try {
         const [rows] = await db.query('SELECT * FROM cidades ORDER BY nome');
+        console.log('Cidades encontradas:', rows.length);
         res.json(rows);
     } catch (error) {
-        console.error('Erro ao buscar cidades:', error);
-        res.status(500).json({ error: 'Erro ao buscar cidades' });
+        console.error('Erro ao buscar cidades:', {
+            message: error.message,
+            stack: error.stack,
+            sql: error.sql
+        });
+        res.status(500).json({ 
+            error: 'Erro ao buscar cidades',
+            message: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
     }
 });
 

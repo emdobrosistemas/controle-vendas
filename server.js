@@ -190,3 +190,21 @@ const server = app.listen(PORT, () => {
         console.error('Erro ao iniciar servidor:', err);
     }
 });
+
+// Middleware de erro global
+app.use((err, req, res, next) => {
+    console.error('Erro global:', {
+        message: err.message,
+        stack: err.stack,
+        path: req.path,
+        method: req.method,
+        body: req.body,
+        query: req.query
+    });
+
+    res.status(err.status || 500).json({
+        error: 'Erro na requisição',
+        message: process.env.NODE_ENV === 'development' ? err.message : 'Erro interno do servidor',
+        path: req.path
+    });
+});
