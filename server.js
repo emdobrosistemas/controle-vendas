@@ -5,38 +5,59 @@ require('dotenv').config();
 const db = require('./db/connection');
 
 const app = express();
-
-// Prefixo global para todas as rotas da API
 const API_PREFIX = '/gestao/api';
 
 // Middlewares básicos
 app.use(cors());
 app.use(express.json());
 
-// Middleware para debug
+// Debug middleware - deve ser o primeiro para logar todas as requisições
 app.use((req, res, next) => {
-    console.log('=== Request Debug ===');
+    console.log('\n=== Nova Requisição ===');
     console.log('URL:', req.url);
-    console.log('Method:', req.method);
-    console.log('Path:', req.path);
-    console.log('Original URL:', req.originalUrl);
+    console.log('Método:', req.method);
+    console.log('Caminho:', req.path);
+    console.log('URL Original:', req.originalUrl);
+    console.log('===================\n');
     next();
 });
 
-// IMPORTANTE: Rotas da API ANTES dos arquivos estáticos
-app.use(`${API_PREFIX}/cidades`, require('./routes/cidadeRoutes'));
-app.use(`${API_PREFIX}/lotes`, require('./routes/loteRoutes'));
-app.use(`${API_PREFIX}/lancamentos`, require('./routes/lancamentoRoutes'));
-app.use(`${API_PREFIX}/usuarios`, require('./routes/usuarioRoutes'));
+// Rotas da API - DEVEM vir ANTES dos arquivos estáticos
+const cidadeRoutes = require('./routes/cidadeRoutes');
+const loteRoutes = require('./routes/loteRoutes');
+const lancamentoRoutes = require('./routes/lancamentoRoutes');
+const usuarioRoutes = require('./routes/usuarioRoutes');
+
+// Registrando as rotas com logs
+app.use(`${API_PREFIX}/cidades`, (req, res, next) => {
+    console.log('Rota de cidades acessada');
+    cidadeRoutes(req, res, next);
+});
+
+app.use(`${API_PREFIX}/lotes`, (req, res, next) => {
+    console.log('Rota de lotes acessada');
+    loteRoutes(req, res, next);
+});
+
+app.use(`${API_PREFIX}/lancamentos`, (req, res, next) => {
+    console.log('Rota de lançamentos acessada');
+    lancamentoRoutes(req, res, next);
+});
+
+app.use(`${API_PREFIX}/usuarios`, (req, res, next) => {
+    console.log('Rota de usuários acessada');
+    usuarioRoutes(req, res, next);
+});
 
 // Arquivos estáticos DEPOIS das rotas da API
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/css', express.static(path.join(__dirname, 'public/css')));
 
-// Middleware para erros da API
+// Handler para erros 404 da API
 app.use(`${API_PREFIX}/*`, (req, res) => {
+    console.log('404 na API:', req.originalUrl);
     res.status(404).json({
-        error: 'API endpoint não encontrado',
+        error: 'Endpoint não encontrado',
         path: req.originalUrl
     });
 });
@@ -93,6 +114,7 @@ const server = app.listen(PORT, () => {
         DB_DATABASE: process.env.DB_DATABASE,
         PORT: process.env.PORT
     });
+    console.log('API Prefix:', API_PREFIX);
 }).on('error', (err) => {
     if (err.code === 'EADDRINUSE') {
         console.log(`Porta ${PORT} em uso, tentando porta ${PORT + 1}`);

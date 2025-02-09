@@ -2,27 +2,26 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db/connection');
 
-// Log para debug
+// Debug middleware específico para rotas de cidade
 router.use((req, res, next) => {
-    console.log('=== Cidade Route Debug ===');
-    console.log('Method:', req.method);
-    console.log('URL:', req.url);
-    console.log('Path:', req.path);
-    console.log('Full URL:', req.protocol + '://' + req.get('host') + req.originalUrl);
+    console.log('\n=== Rota de Cidades ===');
+    console.log('Método:', req.method);
+    console.log('URL:', req.originalUrl);
     next();
 });
 
-// Listar todas as cidades
+// GET /cidades
 router.get('/', async (req, res) => {
     try {
+        console.log('Buscando todas as cidades...');
         const [rows] = await db.query('SELECT * FROM cidades ORDER BY nome');
-        console.log('Cidades encontradas:', rows.length);
+        console.log(`${rows.length} cidades encontradas`);
         res.json(rows);
     } catch (error) {
         console.error('Erro ao buscar cidades:', error);
         res.status(500).json({ 
             error: 'Erro ao buscar cidades',
-            details: process.env.NODE_ENV === 'development' ? error.message : undefined
+            details: error.message 
         });
     }
 });
