@@ -2,13 +2,20 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db/connection');
 
+// Log para debug
+router.use((req, res, next) => {
+    console.log('Cidade Route accessed:', req.method, req.url);
+    next();
+});
+
 // Listar todas as cidades
 router.get('/', async (req, res) => {
     try {
         const [rows] = await db.query('SELECT * FROM cidades ORDER BY nome');
         res.json(rows);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('Erro ao buscar cidades:', error);
+        res.status(500).json({ error: 'Erro ao buscar cidades' });
     }
 });
 
