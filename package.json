@@ -7,7 +7,9 @@
     "build": "npm run build:css",
     "build:css": "postcss public/css/styles.css -o public/css/output.css",
     "dev": "nodemon server.js",
-    "watch:css": "npx tailwindcss -i ./public/css/styles.css -o ./public/css/output.css --watch"
+    "watch:css": "npx tailwindcss -i ./public/css/styles.css -o ./public/css/output.css --watch",
+    "prod": "pm2 start ecosystem.config.js",
+    "stop": "pm2 stop gestao-api"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",

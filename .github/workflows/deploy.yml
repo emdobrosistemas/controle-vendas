@@ -11,6 +11,17 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     
+    - name: Install Dependencies
+      run: npm install
+      
+    - name: Create .env file
+      run: |
+        echo "DB_HOST=${{ secrets.DB_HOST }}" > .env
+        echo "DB_USER=${{ secrets.DB_USER }}" > .env
+        echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+        echo "DB_DATABASE=${{ secrets.DB_DATABASE }}" >> .env
+        echo "PORT=3000" >> .env
+    
     - name: FTP Deploy
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
       with:
@@ -19,3 +30,7 @@ jobs:
         password: ${{ secrets.HOSTINGER_PASSWORD }}
         server-dir: /home/u727308653/domains/brasilemdobro.com.br/public_html/gestao/
         protocol: ftp
+        exclude: |
+          **/.git*
+          **/.git*/**
+          **/node_modules/**
