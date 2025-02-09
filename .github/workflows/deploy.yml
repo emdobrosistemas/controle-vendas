@@ -3,7 +3,7 @@ name: 🚀 Deploy website on push
 on:
   push:
     branches:
-      - main  # ou master, dependendo da sua branch principal
+      - main
 
 jobs:
   web-deploy:
@@ -15,50 +15,12 @@ jobs:
     - name: 🚚 Get latest code
       uses: actions/checkout@v3
 
-    - name: Install Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: '16'
-
-    - name: Install Dependencies
-      run: npm install
-
-    - name: Create .env file
-      run: |
-        echo "DB_HOST=${{ secrets.DB_HOST }}" > .env
-        echo "DB_USER=${{ secrets.DB_USER }}" >> .env
-        echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
-        echo "DB_DATABASE=${{ secrets.DB_DATABASE }}" >> .env
-        echo "PORT=3001" >> .env
-
-    - name: Create .htaccess file
-      run: |
-        echo "RewriteEngine On" > .htaccess
-        echo "" >> .htaccess
-        echo "# Permitir acesso direto a arquivos existentes" >> .htaccess
-        echo "RewriteCond %{REQUEST_FILENAME} !-f" >> .htaccess
-        echo "RewriteCond %{REQUEST_FILENAME} !-d" >> .htaccess
-        echo "" >> .htaccess
-        echo "# Redirecionar todas as outras requisições para o Node.js" >> .htaccess
-        echo "RewriteRule ^(.*)$ http://127.0.0.1:3000/\$1 [P,L]" >> .htaccess
-        echo "" >> .htaccess
-        echo "# Adicione tipos MIME corretos" >> .htaccess
-        echo "AddType application/javascript .js" >> .htaccess
-        echo "AddType text/css .css" >> .htaccess
-
-    - name: Build CSS
-      run: |
-        npm install
-        npm run build:css
-        ls -la public/css/
-
     - name: 📂 SFTP Deploy
       uses: wlixcc/SFTP-Deploy-Action@v1.2.4
       with:
-        username: ${{ secrets.FTP_USERNAME }}
-        server: ${{ secrets.FTP_SERVER }}
-        port: 22  # porta padrão SFTP
-        local_path: './*'  # arquivos locais para enviar
-        remote_path: '/path/to/your/website'  # caminho remoto
-        password: ${{ secrets.FTP_PASSWORD }}
-        # ou use ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+        username: ${{ secrets.HOSTINGER_USERNAME }}
+        server: ${{ secrets.HOSTINGER_HOST }}
+        port: 22
+        local_path: './*'
+        remote_path: '/home/u727308653/domains/brasilemdobro.com.br/public_html/gestao'
+        password: ${{ secrets.SFTP_PASSWORD }}

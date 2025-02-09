@@ -6,7 +6,7 @@ const db = require('./db/connection');
 
 const app = express();
 
-// No início do arquivo, após as importações
+// Prefixo global para todas as rotas da API
 const API_PREFIX = '/gestao/api';
 
 // Middlewares
@@ -71,85 +71,58 @@ app.use((req, res, next) => {
     next();
 });
 
-// Rotas da API usando a constante API_PREFIX
+// Rotas da API
 app.use(`${API_PREFIX}/cidades`, require('./routes/cidadeRoutes'));
-const loteRoutes = require('./routes/loteRoutes');
-if (!loteRoutes) {
-    console.error('Erro: routes/loteRoutes.js não foi carregado corretamente');
-    process.exit(1);
-}
-app.use(`${API_PREFIX}/lotes`, loteRoutes);
+app.use(`${API_PREFIX}/lotes`, require('./routes/loteRoutes'));
 app.use(`${API_PREFIX}/lancamentos`, require('./routes/lancamentoRoutes'));
 app.use(`${API_PREFIX}/usuarios`, require('./routes/usuarioRoutes'));
 
-// Tratamento de erros para rotas da API
-app.use(API_PREFIX, (err, req, res, next) => {
-    console.error('API Error:', {
-        error: err,
+// Middleware para debug de rotas
+app.use((req, res, next) => {
+    console.log('Request:', {
+        method: req.method,
+        url: req.url,
+        path: req.path,
+        originalUrl: req.originalUrl
+    });
+    next();
+});
+
+// Depois servimos os arquivos estáticos
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/css', express.static(path.join(__dirname, 'public/css')));
+
+// Middleware para tratar erros 404 da API
+app.use(`${API_PREFIX}/*`, (req, res) => {
+    console.log('API 404:', req.originalUrl);
+    res.status(404).json({ 
+        error: 'Rota não encontrada',
+        path: req.originalUrl 
+    });
+});
+
+// Rota para o frontend - DEVE vir depois das rotas da API e arquivos estáticos
+app.get('*', (req, res) => {
+    console.log('Serving index.html for:', req.url);
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Middleware de erro global - DEVE ser o último middleware
+app.use((err, req, res, next) => {
+    console.error('Erro global:', {
+        message: err.message,
         stack: err.stack,
         path: req.path,
-        method: req.method
+        method: req.method,
+        body: req.body,
+        query: req.query
     });
-    
-    res.status(err.status || 500).json({ 
+
+    res.status(err.status || 500).json({
         error: 'Erro na requisição',
         message: process.env.NODE_ENV === 'development' ? err.message : 'Erro interno do servidor',
         path: req.path
     });
-});
-
-// Adicione um middleware para tratar erros 404 específicos da API
-app.use(`${API_PREFIX}/*`, (req, res) => {
-    console.log('API 404:', {
-        path: req.path,
-        method: req.method,
-        originalUrl: req.originalUrl
-    });
-    
-    res.status(404).json({ 
-        error: 'Rota não encontrada',
-        message: 'O endpoint solicitado não existe',
-        path: req.originalUrl
-    });
-});
-
-// Adicione log para requisições
-app.use((req, res, next) => {
-    console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
-    next();
-});
-
-// Depois os arquivos estáticos
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/css', express.static(path.join(__dirname, 'public/css')));
-
-// Adicione headers para CSS
-app.use((req, res, next) => {
-    if (req.url.endsWith('.css')) {
-        res.setHeader('Content-Type', 'text/css');
-    }
-    next();
-});
-
-// Adicione logs para debug
-app.use((req, res, next) => {
-    console.log(`${req.method} ${req.url}`);
-    next();
-});
-
-// Adicione antes da rota catch-all
-app.use(`${API_PREFIX}/*`, (req, res) => {
-    console.log('Rota API não encontrada:', req.method, req.url);
-    res.status(404).json({ 
-        error: 'Rota não encontrada',
-        path: req.url,
-        method: req.method
-    });
-});
-
-// Por último, a rota catch-all
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // Teste de conexão com o banco
@@ -189,22 +162,4 @@ const server = app.listen(PORT, () => {
     } else {
         console.error('Erro ao iniciar servidor:', err);
     }
-});
-
-// Middleware de erro global
-app.use((err, req, res, next) => {
-    console.error('Erro global:', {
-        message: err.message,
-        stack: err.stack,
-        path: req.path,
-        method: req.method,
-        body: req.body,
-        query: req.query
-    });
-
-    res.status(err.status || 500).json({
-        error: 'Erro na requisição',
-        message: process.env.NODE_ENV === 'development' ? err.message : 'Erro interno do servidor',
-        path: req.path
-    });
 });

@@ -1,7 +1,5 @@
 // Funções para interagir com a API
-const API_URL = window.location.hostname === 'localhost' 
-    ? 'http://localhost:3000/api'
-    : '/gestao/api';
+const API_BASE_URL = '/gestao/api';
 
 // Função para permitir apenas números e vírgula
 function apenasNumeros(event) {
@@ -55,25 +53,31 @@ async function handleApiResponse(response) {
 
 // Função genérica para chamadas à API
 async function fetchApi(endpoint, options = {}) {
-    const defaultOptions = {
-        credentials: 'include',
-        headers: {
-            'Content-Type': 'application/json'
+    try {
+        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Erro na requisição');
         }
-    };
 
-    const response = await fetch(`${API_URL}${endpoint}`, {
-        ...defaultOptions,
-        ...options
-    });
-
-    return handleApiResponse(response);
+        return await response.json();
+    } catch (error) {
+        console.error('API Error:', error);
+        throw error;
+    }
 }
 
 // Função de login atualizada
 async function login(email, senha) {
     try {
-        const response = await fetch(`${API_URL}/usuarios/login`, {
+        const response = await fetch(`${API_BASE_URL}/usuarios/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, senha })
