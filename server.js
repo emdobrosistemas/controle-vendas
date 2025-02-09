@@ -6,6 +6,9 @@ const db = require('./db/connection');
 
 const app = express();
 
+// No início do arquivo, após as importações
+const API_PREFIX = '/gestao/api';
+
 // Middlewares
 app.use(cors({
     origin: process.env.NODE_ENV === 'production' 
@@ -31,40 +34,75 @@ app.use((req, res, next) => {
     next();
 });
 
-// Prefixo /api para todas as rotas da API
-app.use('/api', (req, res, next) => {
+// Prefixo /gestao/api para todas as rotas da API
+app.use(API_PREFIX, (req, res, next) => {
+    console.log('=== API Request ===');
+    console.log('Hitting API endpoint');
+    console.log('Full path:', req.originalUrl);
+    console.log('Method:', req.method);
+    console.log('Body:', req.body);
+    console.log('Query:', req.query);
+    console.log('Params:', req.params);
+    console.log('=== End API Request ===');
+    
     res.setHeader('Content-Type', 'application/json');
-    console.log('API Request:', {
-        method: req.method,
-        url: req.url,
-        body: req.body,
-        timestamp: new Date().toISOString()
-    });
     next();
 });
 
-// Rotas da API
-app.use('/api/cidades', require('./routes/cidadeRoutes'));
-app.use('/api/lotes', require('./routes/loteRoutes'));
-app.use('/api/lancamentos', require('./routes/lancamentoRoutes'));
-app.use('/api/usuarios', require('./routes/usuarioRoutes'));
+// Adicione este middleware no início, logo após as configurações do CORS
+app.use((req, res, next) => {
+    console.log('Request URL:', req.url);
+    console.log('Request Method:', req.method);
+    console.log('Request Path:', req.path);
+    console.log('Route Match:', req.route);
+    next();
+});
+
+// Adicione este middleware logo após a definição do API_PREFIX
+app.use((req, res, next) => {
+    console.log('=== Request Debug Info ===');
+    console.log('Full URL:', req.protocol + '://' + req.get('host') + req.originalUrl);
+    console.log('Method:', req.method);
+    console.log('Path:', req.path);
+    console.log('Base URL:', req.baseUrl);
+    console.log('Original URL:', req.originalUrl);
+    console.log('Headers:', req.headers);
+    console.log('=== End Debug Info ===');
+    next();
+});
+
+// Rotas da API usando a constante API_PREFIX
+app.use(`${API_PREFIX}/cidades`, require('./routes/cidadeRoutes'));
+const loteRoutes = require('./routes/loteRoutes');
+if (!loteRoutes) {
+    console.error('Erro: routes/loteRoutes.js não foi carregado corretamente');
+    process.exit(1);
+}
+app.use(`${API_PREFIX}/lotes`, loteRoutes);
+app.use(`${API_PREFIX}/lancamentos`, require('./routes/lancamentoRoutes'));
+app.use(`${API_PREFIX}/usuarios`, require('./routes/usuarioRoutes'));
 
 // Tratamento de erros para rotas da API
-app.use('/api', (err, req, res, next) => {
+app.use(API_PREFIX, (err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({ error: 'Erro interno do servidor' });
 });
 
-// Adicione tratamento de erros mais detalhado
+// Adicione um middleware de erro mais detalhado
 app.use((err, req, res, next) => {
-    console.error('Error details:', {
-        message: err.message,
-        stack: err.stack,
-        code: err.code
-    });
-    res.status(500).json({ 
+    console.error('=== Error Details ===');
+    console.error('Error:', err);
+    console.error('Stack:', err.stack);
+    console.error('URL:', req.originalUrl);
+    console.error('Method:', req.method);
+    console.error('Body:', req.body);
+    console.error('=== End Error Details ===');
+    
+    res.status(500).json({
         error: 'Erro interno do servidor',
-        details: process.env.NODE_ENV === 'development' ? err.message : undefined
+        message: process.env.NODE_ENV === 'development' ? err.message : undefined,
+        path: req.originalUrl,
+        method: req.method
     });
 });
 
@@ -74,7 +112,7 @@ app.use((req, res, next) => {
     next();
 });
 
-// Servir arquivos estáticos - coloque antes de todas as outras rotas
+// Depois os arquivos estáticos
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/css', express.static(path.join(__dirname, 'public/css')));
 
@@ -92,7 +130,17 @@ app.use((req, res, next) => {
     next();
 });
 
-// Rota para a página principal deve ser a última
+// Adicione antes da rota catch-all
+app.use(`${API_PREFIX}/*`, (req, res) => {
+    console.log('Rota API não encontrada:', req.method, req.url);
+    res.status(404).json({ 
+        error: 'Rota não encontrada',
+        path: req.url,
+        method: req.method
+    });
+});
+
+// Por último, a rota catch-all
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
