@@ -22,5 +22,5 @@ jobs:
         server: ${{ secrets.HOSTINGER_HOST }}
         port: 22
         local_path: './*'
-        remote_path: '/home/u727308653/domains/brasilemdobro.com.br/public_html/gestao'
-        password: ${{ secrets.SFTP_PASSWORD }}
+        remote_path: '/home/u727308653/domains/brasilemdobro.com.br/public_html/gestao/api'
+        password: ${{ secrets.HOSTINGER_PASSWORD }}
