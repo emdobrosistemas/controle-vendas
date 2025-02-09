@@ -7,9 +7,8 @@ router.use((req, res, next) => {
     console.log('=== Cidade Route Debug ===');
     console.log('Method:', req.method);
     console.log('URL:', req.url);
-    console.log('Body:', req.body);
-    console.log('Query:', req.query);
-    console.log('========================');
+    console.log('Path:', req.path);
+    console.log('Full URL:', req.protocol + '://' + req.get('host') + req.originalUrl);
     next();
 });
 
@@ -20,14 +19,10 @@ router.get('/', async (req, res) => {
         console.log('Cidades encontradas:', rows.length);
         res.json(rows);
     } catch (error) {
-        console.error('Erro ao buscar cidades:', {
-            message: error.message,
-            stack: error.stack,
-            sql: error.sql
-        });
+        console.error('Erro ao buscar cidades:', error);
         res.status(500).json({ 
             error: 'Erro ao buscar cidades',
-            message: process.env.NODE_ENV === 'development' ? error.message : undefined
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined
         });
     }
 });

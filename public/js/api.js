@@ -1,7 +1,7 @@
 // Funções para interagir com a API
 const API_BASE_URL = window.location.hostname === 'localhost' 
     ? 'http://localhost:3000/gestao/api'
-    : 'https://gestao.brasilemdobro.com.br/gestao/api';
+    : '/gestao/api';  // Caminho correto para produção
 
 // Função para permitir apenas números e vírgula
 function apenasNumeros(event) {
@@ -56,13 +56,20 @@ async function handleApiResponse(response) {
 // Função genérica para chamadas à API
 async function fetchApi(endpoint, options = {}) {
     try {
-        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        // Log para debug da URL completa
+        const url = `${API_BASE_URL}${endpoint}`;
+        console.log('Fazendo requisição para:', url);
+
+        const response = await fetch(url, {
             ...options,
             headers: {
                 'Content-Type': 'application/json',
                 ...options.headers
             }
         });
+
+        // Log para debug
+        console.log('Status da resposta:', response.status);
 
         if (!response.ok) {
             const error = await response.json();
@@ -71,7 +78,12 @@ async function fetchApi(endpoint, options = {}) {
 
         return await response.json();
     } catch (error) {
-        console.error('API Error:', error);
+        console.error('API Error:', {
+            message: error.message,
+            endpoint: endpoint,
+            url: url,
+            status: error.response?.status
+        });
         throw error;
     }
 }
