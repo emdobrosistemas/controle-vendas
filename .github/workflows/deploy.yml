@@ -1,18 +1,19 @@
-name: Deploy to Hostinger
+name: 🚀 Deploy website on push
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main  # ou master, dependendo da sua branch principal
 
 jobs:
   web-deploy:
-    name: Deploy
+    name: 🎉 Deploy
     runs-on: ubuntu-latest
     environment: production
 
     steps:
-    - name: Get latest code
-      uses: actions/checkout@v2
+    - name: 🚚 Get latest code
+      uses: actions/checkout@v3
 
     - name: Install Node.js
       uses: actions/setup-node@v2
@@ -51,16 +52,13 @@ jobs:
         npm run build:css
         ls -la public/css/
 
-    - name: Sync files
-      uses: SamKirkland/FTP-Deploy-Action@4.3.3
+    - name: 📂 SFTP Deploy
+      uses: wlixcc/SFTP-Deploy-Action@v1.2.4
       with:
-        server: ${{ secrets.DB_HOST }}
-        username: ${{ secrets.DB_USER }}
-        password: ${{ secrets.DB_PASSWORD }}
-        server-dir: /home/u727308653/domains/brasilemdobro.com.br/public_html/gestao/
-        exclude: |
-          **/.git*
-          **/.git*/**
-          **/node_modules/**
-          .env
-          package-lock.json
+        username: ${{ secrets.FTP_USERNAME }}
+        server: ${{ secrets.FTP_SERVER }}
+        port: 22  # porta padrão SFTP
+        local_path: './*'  # arquivos locais para enviar
+        remote_path: '/path/to/your/website'  # caminho remoto
+        password: ${{ secrets.FTP_PASSWORD }}
+        # ou use ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
