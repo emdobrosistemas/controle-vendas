@@ -3,3 +3,4 @@ vendor/
 .env
 package-lock.json
 public/css/output.css
+.DS_Store
