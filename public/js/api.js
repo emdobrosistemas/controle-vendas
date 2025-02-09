@@ -1,5 +1,7 @@
 // Funções para interagir com a API
-const API_BASE_URL = '/gestao/api';
+const API_BASE_URL = window.location.hostname === 'localhost' 
+    ? 'http://localhost:3000/gestao/api'
+    : 'https://gestao.brasilemdobro.com.br/gestao/api';
 
 // Função para permitir apenas números e vírgula
 function apenasNumeros(event) {
